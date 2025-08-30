@@ -1,6 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from.schemas import AnalyzeRequest, AnalyzeResponse
+from .preprocess import extract_text_from_pdf_bytes
+from .ai import analyze
 import os
 
 
@@ -42,3 +45,17 @@ def analyze(_: AnalyzeRequest):
         reply="Obrigado pela mensagem!",
         model="mock"
     )
+
+
+@app.post("/upload", response_model=AnalyzeResponse)
+async def upload(file: UploadFile = File(...), mode: str = "ai"):
+    if file.content_type not in ("text/plain", "application/pdf"):
+        raise HTTPException(400, "Apenas .txt ou .pdf")
+    data = await file.read()
+    if file.content_type == "application/pdf":
+        text = extract_text_from_pdf_bytes(data)
+    else:
+        text = data.decode("utf-8", errors="ignore")
+    if not text:
+        raise HTTPException(400, "Não foi possível extrair texto")
+    return AnalyzeResponse(**analyze(text, mode=mode))
