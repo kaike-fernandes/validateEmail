@@ -1,8 +1,24 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 import os
 
+
 app = FastAPI(title="Email AI - API", version="0.0.1")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[os.getenv("CORS_ORIGINS", "http://localhost:5173")],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def health():
+    return {
+        "success": True,
+        "message": "Olá, você está na API de validação de Email"}
+
 
 @app.get("/health")
 def health():
