@@ -6,7 +6,7 @@ class AnalyzeRequest(BaseModel):
 
 class AnalyzeResponse(BaseModel):
     category: str
-    confidence: str
+    confidence: float
     reply: str
     justification: str
     model: str

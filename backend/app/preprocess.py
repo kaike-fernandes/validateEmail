@@ -10,7 +10,9 @@ def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
 
 
 def clean(text: str) -> str:
-    text = re.sub(r"\r", "\n", text)
+    if not text:
+        return ""
+    text = text.replace("\r", "\n")
     text = re.sub(r"\n{3,}", "\n\n", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
