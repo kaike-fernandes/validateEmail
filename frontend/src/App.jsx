@@ -87,9 +87,9 @@ export default function App() {
               <Sparkles className="w-6 h-6"/>
             </div>
             <h1 className="text-3xl tracking-tight font-mono">Email Classifier</h1>
-            <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${health==='online' ? 'bg-emerald-900/60 text-emerald-300' : 'bg-amber-900/60 text-amber-300'}`}>{health}</span>
+            <span className={`ml-2 text-xs font-mono px-2 py-0.5 rounded-full ${health==='online' ? 'bg-emerald-900/60 text-emerald-300' : 'bg-amber-900/60 text-amber-300'}`}>{health}</span>
           </div>
-          <div className="hidden md:flex items-center gap-2 text-xs text-slate-400">
+          <div className="font-mono hidden md:flex items-center gap-2 text-xs text-slate-400">
             <Settings2 className="w-4 h-4"/> {API}
           </div>
         </div>

@@ -1,61 +1,68 @@
+# app/main.py
+import os, io
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from.schemas import AnalyzeRequest, AnalyzeResponse
-from .preprocess import extract_text_from_pdf_bytes
+from pydantic import BaseModel, Field
+from pypdf import PdfReader
 from .ai import analyze
-import os
+from dotenv import load_dotenv
+load_dotenv()
 
+app = FastAPI(title="Email Classifier AI", version="1.0.0")
 
-app = FastAPI(title="Email AI - API", version="0.0.1")
-
+origins = list(filter(None, [
+    os.getenv("FRONTEND_ORIGIN"),
+    "http://localhost:5173", "http://127.0.0.1:5173",
+]))
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.getenv("CORS_ORIGINS", "http://localhost:5173")],
+    allow_origins=origins or ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/")
-def health():
-    return {
-        "success": True,
-        "message": "Olá, você está na API de validação de Email"}
-
-
-@app.get("/health")
-def health():
-    return {"ok": True, "env": "prod" if os.getenv("RENDER") else "local"}
-
 class AnalyzeRequest(BaseModel):
-    text: str
+    text: str = Field(..., min_length=5)
+    mode: str = Field("ai", description="'ai' | 'baseline'")
 
 class AnalyzeResponse(BaseModel):
     category: str
     confidence: float
     reply: str
+    justification: str
     model: str
 
-# endpoint mockado p/ manter deploy estável
-@app.post("/analyze", response_model=AnalyzeResponse)
-def analyze(_: AnalyzeRequest):
-    return AnalyzeResponse(
-        category="Improdutivo",
-        confidence=0.5,
-        reply="Obrigado pela mensagem!",
-        model="mock"
-    )
+@app.get("/health")
+async def health():
+    return {"ok": True}
 
+@app.get("/diag")
+async def diag():
+    return {
+        "has_key": bool(os.getenv("OPENAI_API_KEY")),
+        "model_env": os.getenv("OPENAI_MODEL"),
+        "cors_origins": list(origins) if origins else ["*"],
+    }
+
+@app.post("/analyze", response_model=AnalyzeResponse)
+async def analyze_text(body: AnalyzeRequest):
+    data = analyze(body.text, mode=body.mode)
+    return AnalyzeResponse(**data)
 
 @app.post("/upload", response_model=AnalyzeResponse)
 async def upload(file: UploadFile = File(...), mode: str = "ai"):
     if file.content_type not in ("text/plain", "application/pdf"):
         raise HTTPException(400, "Apenas .txt ou .pdf")
-    data = await file.read()
+
+    raw = await file.read()
     if file.content_type == "application/pdf":
-        text = extract_text_from_pdf_bytes(data)
+        reader = PdfReader(io.BytesIO(raw))
+        text = "\n".join((p.extract_text() or "") for p in reader.pages).strip()
     else:
-        text = data.decode("utf-8", errors="ignore")
-    if not text:
-        raise HTTPException(400, "Não foi possível extrair texto")
-    return AnalyzeResponse(**analyze(text, mode=mode))
+        text = raw.decode("utf-8", errors="ignore").strip()
+
+    if not text or len(text) < 5:
+        raise HTTPException(400, "Não foi possível extrair texto útil")
+
+    data = analyze(text, mode=mode)
+    return AnalyzeResponse(**data)
