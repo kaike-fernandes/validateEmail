@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Upload, FileText, Sparkles, Trash2, Copy, Check, Brain, Settings2, Bot, Heart } from "lucide-react";
 import './App.css'
@@ -9,6 +10,7 @@ const stagger = { show: { transition: { staggerChildren: .06 } } };
 
 export default function App() {
 
+  // eslint-disable-next-line no-unused-vars
   const [mode, setMode] = useState("ai");
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
