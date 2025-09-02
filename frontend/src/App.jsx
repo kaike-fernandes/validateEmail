@@ -151,7 +151,7 @@ export default function App() {
           ) : (
             <div className="space-y-8 mt-2.5">
               <div className="flex items-center justify-center mb-4 px-14">
-                <motion.span initial={{scale: 0}} animate={{scale: 1}} className={`w-1/4 font-mono px-3 py-1 rounded-full text-lg tracking-wide duration-600 ${result.category==='Produtivo' ? 'bg-amber-500 text-black font-bold' : 'bg-green-800 text-green-100'}`} whileHover={{scale:1.05}} whileTap={{scale:0.95}}>{result.category}</motion.span>
+                <motion.span initial={{scale: 0}} animate={{scale: 1}} className={`font-mono px-3 py-1 rounded-full text-xs tracking-wide duration-600 ${result.category==='Produtivo' ? 'bg-amber-500 text-black font-bold' : 'bg-green-800 text-green-100'}`} whileHover={{scale:1.05}} whileTap={{scale:0.95}}>{result.category}</motion.span>
               </div>
 
 
