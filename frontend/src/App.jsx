@@ -131,10 +131,10 @@ export default function App() {
           </div>
 
           <div className="mt-6 flex gap-3">
-            <button onClick={onAnalyze} disabled={!canSubmit||loading} className="w-full btn-primary disabled:opacity-50">
+            <button onClick={onAnalyze} disabled={!canSubmit||loading} className="font-mono w-full btn-primary disabled:opacity-50">
               {loading ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Analisar'}
             </button>
-            <button onClick={resetAll} className="w-full btn-ghost flex items-center gap-2 justify-center">
+            <button onClick={resetAll} className="w-full btn-ghost font-mono flex items-center gap-2 justify-center">
               <Trash2 className="w-4 h-4"/>
               Limpar
             </button>
@@ -147,28 +147,26 @@ export default function App() {
         <motion.section variants={fade} className="rounded-2xl px-12 py-8">
           <h2 className="text-xl font-semibold font-mono">Resultado</h2>
           {!result ? (
-            <p className="text-slate-400 text-sm">Envie um texto/arquivo para classificar.</p>
+            <p className="text-slate-400 text-sm font-mono">Envie um texto/arquivo para classificar.</p>
           ) : (
-            <div className="space-y-8">
-              <div className="flex items-center justify-between mb-4 px-14">
-                <span className={`font-mono px-3 py-1 rounded-full text-xs tracking-wide ${result.category==='Produtivo' ? 'bg-emerald-900/70 text-emerald-300' : 'bg-slate-800 text-slate-200'}`}>{result.category}</span>
-                <span className="text-xs font-mono text-slate-400">Confiança: {(result.confidence*100).toFixed(0)}%</span>
+            <div className="space-y-8 mt-2.5">
+              <div className="flex items-center justify-center mb-4 px-14">
+                <motion.span initial={{scale: 0}} animate={{scale: 1}} className={`w-1/4 font-mono px-3 py-1 rounded-full text-lg tracking-wide duration-600 ${result.category==='Produtivo' ? 'bg-amber-500 text-black font-bold' : 'bg-green-800 text-green-100'}`} whileHover={{scale:1.05}} whileTap={{scale:0.95}}>{result.category}</motion.span>
               </div>
 
 
-              <div className="w-full px-10 flex flex-col justify-center items-center">
-                <textarea readOnly className="font-mono input h-64 w-full border-indigo-500 border-2 hover:border-indigo-600 focus:outline-none focus:border-indigo-600 rounded-2xl p-4">{result.reply}</textarea>
-                <button onClick={async()=>{await copy();}} className="w-1/2 btn-ghost text-xs flex justify-center items-center gap-2 mt-4">
+              <motion.div initial={{scale: 0}} animate={{scale: 1}} className="duration-1000 w-full px-10 flex flex-col justify-center items-center">
+                <textarea readOnly className={`font-mono input h-64 w-full  rounded-2xl p-4 ${result.category === 'Produtivo' ? 'border-amber-500 border-2 hover:border-amber-400 focus:outline-none focus:border-amber-400' : 'border-green-800 border-2 hover:border-green-600 focus:outline-none focus:border-green-600'}`}>{result.reply}</textarea>
+                <button onClick={async()=>{await copy();}} className="font-mono w-1/2 btn-ghost text-xs flex justify-center items-center gap-2 mt-4">
                   {copied ? (<><Check className="w-4 h-4"/> Copiado</>) : (<><Copy className="w-4 h-4"/> Copiar</>)}
                 </button>
-              </div>
+              </motion.div>
             </div>
           )}
         </motion.section>
       </motion.main>
       <footer className="text-center text-[15px] text-slate-300 py-6 animate-pulse font-mono">
-        Desenvolvido por Kaike Fernandes.<br/>
-        Feito com ❤️
+        Desenvolvido por Kaike Fernandes.
       </footer>
     </div>
   )
